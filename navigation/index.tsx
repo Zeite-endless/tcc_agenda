@@ -14,10 +14,17 @@ import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
-import TabOneScreen from '../screens/TabOneScreen';
-import TabTwoScreen from '../screens/TabTwoScreen';
+import InitialPage from '../screens/InitialPage';
+import FriendListScreen from '../screens/friendListScreen';
+import SchedulerScreen from '../screens/SchedulerScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+
+import LoginScreen from '../screens/LoginScreen';
+import {useSelector} from 'react-redux';
+import { Avatar } from 'react-native-elements';
+import { StyleSheet } from 'react-native';
+import { useEffect } from 'react';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -36,9 +43,16 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
+
+  const user = useSelector((state: any) => state.user);
+
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+      {(user.signedState == false) ? (
+        <Stack.Screen name="Login" component={LoginScreen} />
+      ) : (
+        <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+      )}
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
@@ -56,46 +70,84 @@ const BottomTab = createBottomTabNavigator<RootTabParamList>();
 function BottomTabNavigator() {
   const colorScheme = useColorScheme();
 
+  const user = useSelector((state: any) => state.userInfo);
+  useEffect(() => {
+  }, [user]);
+
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
+      initialRouteName="InitialPage"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
       }}>
       <BottomTab.Screen
-        name="TabOne"
-        component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        name="InitialPage"
+        component={InitialPage}
+        options={({ navigation }: RootTabScreenProps<'InitialPage'>) => ({
+          title: 'Home',
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate('Modal')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesome
-                name="info-circle"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
+            <Avatar 
+            source={{uri: user.userData.picture ? user.userData.picture 
+            : 'https://cdn-icons-png.flaticon.com/512/147/147140.png'}} 
+            size={36}
+            rounded
+            containerStyle={style.avatar} >
+
+            </Avatar>
           ),
         })}
       />
+
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
+        name="Scheduler"
+        component={SchedulerScreen}
+        options={({ navigation }: RootTabScreenProps<'Scheduler'>) => ({
+          title: 'Agenda',
+          tabBarIcon: ({ color }) => <TabBarIcon name="calendar" color={color} />,
+          headerRight: () => (
+            <Avatar 
+            source={{uri: user.userData.picture ? user.userData.picture 
+            : 'https://cdn-icons-png.flaticon.com/512/147/147140.png'}} 
+            size={36}
+            rounded
+            containerStyle={style.avatar} >
+
+            </Avatar>
+          )
+        })}
+      />
+
+      <BottomTab.Screen
+        name="FriendList"
+        component={FriendListScreen}
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Nova Agenda',
+          tabBarIcon: ({ color }) => <TabBarIcon  name="plus" color={color} />,
+          headerRight: () => (
+            <Avatar 
+            source={{uri: user.userData.picture ? user.userData.picture 
+            : 'https://cdn-icons-png.flaticon.com/512/147/147140.png'}} 
+            size={36}
+            rounded
+            containerStyle={style.avatar} >
+
+            </Avatar>
+          )
         }}
       />
+
+
     </BottomTab.Navigator>
   );
 }
 
+const style = StyleSheet.create({
+  avatar: {
+    marginRight: 20,
+    borderRadius: 50
+  }
+})
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
  */
