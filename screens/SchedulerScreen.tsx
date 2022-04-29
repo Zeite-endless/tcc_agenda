@@ -22,12 +22,21 @@ export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Sche
                 if (!items[strTime]) {
                     items[strTime] = [];
 
+                    let esta_atrasado = false;
+
+                    let calculo_atrasado = 2343123 - 33241212
+
+                    if(calculo_atrasado < 0){
+                        esta_atrasado = true;
+                    }
+
                     const numItems = Math.floor(Math.random() * 3 + 1);
                     for (let j = 0; j < numItems; j++) {
                         items[strTime].push({
                             name: 'Item for ' + strTime + ' #' + j,
                             height: Math.max(50, Math.floor(Math.random() * 150)),
-                            day: strTime
+                            day: strTime,
+                            atrasado: esta_atrasado
                         });
                     }
                 }

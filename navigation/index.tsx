@@ -85,7 +85,7 @@ function BottomTabNavigator() {
         component={InitialPage}
         options={({ navigation }: RootTabScreenProps<'InitialPage'>) => ({
           title: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color }: any) => <TabBarIcon name="home" color={color} />,
           headerRight: () => (
             <Avatar 
             source={{uri: user.userData.picture ? user.userData.picture 
@@ -104,7 +104,7 @@ function BottomTabNavigator() {
         component={SchedulerScreen}
         options={({ navigation }: RootTabScreenProps<'Scheduler'>) => ({
           title: 'Agenda',
-          tabBarIcon: ({ color }) => <TabBarIcon name="calendar" color={color} />,
+          tabBarIcon: ({ color }: any) => <TabBarIcon name="calendar" color={color} />,
           headerRight: () => (
             <Avatar 
             source={{uri: user.userData.picture ? user.userData.picture 
@@ -123,7 +123,7 @@ function BottomTabNavigator() {
         component={FriendListScreen}
         options={{
           title: 'Nova Agenda',
-          tabBarIcon: ({ color }) => <TabBarIcon  name="plus" color={color} />,
+          tabBarIcon: ({ color }: any) => <TabBarIcon  name="plus" color={color} />,
           headerRight: () => (
             <Avatar 
             source={{uri: user.userData.picture ? user.userData.picture 
