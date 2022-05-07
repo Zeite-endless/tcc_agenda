@@ -2,41 +2,55 @@ import { Alert, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
-import { Agenda, AgendaEntry, AgendaSchedule } from 'react-native-calendars';
+import { Agenda, AgendaEntry, AgendaSchedule, DateData } from 'react-native-calendars';
 import React, { useState } from 'react';
 import { Avatar, Card } from 'react-native-elements';
+import { useSelector } from 'react-redux';
+import testIds from '../constants/testIds';
 
 
 
 export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Scheduler'>) {
     const [Items, setItems] = useState<any>({});
+    const userObj = useSelector((state: any) => state.userInfo);
 
-    const loadItems = () => {
+    const [state, setState] = useState<AgendaSchedule>({
+        items: []
+    })
+
+    // render(){
+    //     return  (
+
+    //     )
+    // }
+
+    const loadItems = (day: DateData) => {
         const items = Items || {};
 
         setTimeout(() => {
             for (let i = -15; i < 85; i++) {
-                const time = new Date().getTime() + i * 24 * 60 * 60 * 1000;
+                const time = day.timestamp + i * 24 * 60 * 60 * 1000;
                 const strTime = timeToString(time);
 
                 if (!items[strTime]) {
                     items[strTime] = [];
 
-                    let esta_atrasado = false;
+                    // let esta_atrasado = false;
 
-                    let calculo_atrasado = 2343123 - 33241212
+                    // let calculo_atrasado = 2343123 - 33241212
 
-                    if(calculo_atrasado < 0){
-                        esta_atrasado = true;
-                    }
+                    // if(calculo_atrasado < 0){
+                    //     esta_atrasado = true;
+                    // }
 
                     const numItems = Math.floor(Math.random() * 3 + 1);
                     for (let j = 0; j < numItems; j++) {
                         items[strTime].push({
                             name: 'Item for ' + strTime + ' #' + j,
-                            height: Math.max(50, Math.floor(Math.random() * 150)),
+                            height: 80,
                             day: strTime,
-                            atrasado: esta_atrasado
+                            picture: userObj.userData.picture
+                            // atrasado: esta_atrasado
                         });
                     }
                 }
@@ -55,29 +69,34 @@ export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Sche
     };
 
     const baseImage: AvatarData = {
-        image_url: 'https://cdn-icons-png.flaticon.com/512/147/147140.png'
+        image_url: userObj.userData.picture
     }
 
 
-    const renderItem = (reservation: AgendaEntry) => {
+    const renderItem = (reservation: AgendaEntry, isFirst: boolean) => {
 
+        const fontSize = isFirst ? 16 : 14;
+        const color = isFirst ? 'black' : '#43515c';
         return (
-            <TouchableOpacity>
-                <Card >
+            <TouchableOpacity
+                testID={testIds.agenda.ITEM}
+                style={[styles.item, { height: reservation.height, display: 'flex' }]}
+                onPress={() => Alert.alert(reservation.name)}
+            >
+                {/* <Text style={{ fontSize, color }}>{reservation.name}</Text>
+                <Avatar source={baseImage.image_url ? { uri: baseImage.image_url } : {}} size={64} rounded></Avatar> */}
+                {/* <Card> */}
 
                     <View style={{
                         display: 'flex',
                         flexDirection: 'row',
                         backgroundColor: 'white',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
+                        justifyContent: 'space-around'
                     }}>
-                        <Text style={{color: 'black'}}>{reservation.name}</Text>
-                        <Avatar source={baseImage.image_url ? {uri: baseImage.image_url}: {}} size={64} rounded containerStyle={{
-                            backgroundColor: 'green'
-                        }}></Avatar>
+                        <Text style={{fontSize, color}}>{reservation.name}</Text>
+                        <Avatar source={baseImage.image_url ? { uri: baseImage.image_url } : {}} size={64} rounded></Avatar>
                     </View>
-                </Card>
+                {/* </Card> */}
 
             </TouchableOpacity>
         );
@@ -92,17 +111,40 @@ export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Sche
         return date.toISOString().split('T')[0];
     }
 
+    const renderEmptyDate = () => {
+        return (
+            <View style={styles.emptyDate}>
+                <Text>Parece que não há agendas</Text>
+            </View>
+        )
+    }
+
     return (
-        <View style={styles.container}>
-            <Agenda
-                items={Items}
-                loadItemsForMonth={loadItems}
-                renderItem={renderItem}
-                selected={'2022-02-21'}
-                rowHasChanged={rowHasChanged}
-            />
-        </View>
-    );
+        <Agenda
+            testID={testIds.agenda.CONTAINER}
+            items={Items}
+            loadItemsForMonth={loadItems}
+            selected={'2022-04-29'}
+            renderItem={renderItem}
+            renderEmptyData={renderEmptyDate}
+            rowHasChanged={rowHasChanged}
+            showClosingKnob={true}
+        >
+
+        </Agenda>
+    )
+
+    // return (
+    //     <View style={styles.container}>
+    //         <Agenda
+    //             items={Items}
+    //             loadItemsForMonth={loadItems}
+    //             renderItem={renderItem}
+    //             selected={'2022-04-29'}
+    //             rowHasChanged={rowHasChanged}
+    //         />
+    //     </View>
+    // );
 }
 
 const styles = StyleSheet.create({
@@ -116,5 +158,10 @@ const styles = StyleSheet.create({
         padding: 10,
         marginRight: 10,
         marginTop: 17
+    },
+    emptyDate: {
+        height: 15,
+        flex: 1,
+        paddingTop: 30
     }
 });

@@ -1,5 +1,6 @@
 import { Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
+import ModalScreen from '../screens/ModalScreen';
 
 import { Text, View } from './Themed';
 
@@ -19,7 +20,7 @@ export const NotFriends = () => {
                 
                     <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
                 
-                <TouchableOpacity onPress={alert} style={styles.btn}>
+                <TouchableOpacity onPress={openModal} style={styles.btn}>
                     <Text style={styles.btnTxtColor}>
                         Adicionar conexões!
                     </Text>
@@ -29,8 +30,10 @@ export const NotFriends = () => {
     );
 }
 
-const alert = () => {
-    Alert.alert('Fazer modal de conexão!');
+const openModal = () => {
+    return(
+        <ModalScreen></ModalScreen>
+    )
 }
 
 const styles = StyleSheet.create({
