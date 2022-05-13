@@ -1,6 +1,6 @@
 import { Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
-import ModalScreen from '../screens/ModalScreen';
+import ModalScreen from './ModalScreen';
 
 import { Text, View } from './Themed';
 

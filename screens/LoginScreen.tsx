@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Image, TouchableOpacity, SafeAreaView } from "react-native";
 import * as Google from "expo-auth-session/providers/google";
 import { RootTabScreenProps } from "../types";
 import { Text, View } from "../components/Themed";
@@ -20,7 +20,7 @@ const LoginScreen = ({ navigation }: RootTabScreenProps<'Login'>) => {
     getLogin(response);
     
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/284/284301.png' }} style={styles.logo}>
 
             </Image>
@@ -31,7 +31,7 @@ const LoginScreen = ({ navigation }: RootTabScreenProps<'Login'>) => {
                 <Text>Login com Google</Text>
             </TouchableOpacity>
 
-        </View>
+        </SafeAreaView>
     );
 };
 

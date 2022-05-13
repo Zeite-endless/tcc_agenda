@@ -30,6 +30,7 @@ export type RootTabParamList = {
   FriendList: undefined;
   InitialPage: undefined;
   AdicionarSchedule: undefined;
+  UserProfile: undefined;
   Scheduler: undefined;
   Login: undefined;
 };

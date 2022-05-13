@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, TouchableOpacity } from 'react-native';
+import { Alert, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
@@ -10,19 +10,14 @@ import testIds from '../constants/testIds';
 
 
 
+
 export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Scheduler'>) {
     const [Items, setItems] = useState<any>({});
     const userObj = useSelector((state: any) => state.userInfo);
 
     const [state, setState] = useState<AgendaSchedule>({
         items: []
-    })
-
-    // render(){
-    //     return  (
-
-    //     )
-    // }
+    });
 
     const loadItems = (day: DateData) => {
         const items = Items || {};
@@ -30,18 +25,18 @@ export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Sche
         setTimeout(() => {
             for (let i = -15; i < 85; i++) {
                 const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+
                 const strTime = timeToString(time);
+
+                let isAtrasado: boolean = false;
+                let endOfDay = new Date().setUTCHours(0, 0, 0, 0);
+                if ((time - Number(endOfDay)) < 0) {
+                    isAtrasado = true;
+                }
+
 
                 if (!items[strTime]) {
                     items[strTime] = [];
-
-                    // let esta_atrasado = false;
-
-                    // let calculo_atrasado = 2343123 - 33241212
-
-                    // if(calculo_atrasado < 0){
-                    //     esta_atrasado = true;
-                    // }
 
                     const numItems = Math.floor(Math.random() * 3 + 1);
                     for (let j = 0; j < numItems; j++) {
@@ -49,8 +44,8 @@ export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Sche
                             name: 'Item for ' + strTime + ' #' + j,
                             height: 80,
                             day: strTime,
-                            picture: userObj.userData.picture
-                            // atrasado: esta_atrasado
+                            picture: userObj.userData.picture,
+                            isAtrasado: isAtrasado
                         });
                     }
                 }
@@ -73,29 +68,25 @@ export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Sche
     }
 
 
-    const renderItem = (reservation: AgendaEntry, isFirst: boolean) => {
+    const renderItem = (reservation: AgendaEntry) => {
+        const backgroundColor = reservation.isAtrasado ? 'pink' : '#2e99b6';
 
-        const fontSize = isFirst ? 16 : 14;
-        const color = isFirst ? 'black' : '#43515c';
         return (
             <TouchableOpacity
                 testID={testIds.agenda.ITEM}
-                style={[styles.item, { height: reservation.height, display: 'flex' }]}
+                style={{ height: reservation.height, display: 'flex', backgroundColor: backgroundColor, flex: 1, borderRadius: 5, padding: 10, marginRight: 10, marginTop: 17 }}
                 onPress={() => Alert.alert(reservation.name)}
             >
-                {/* <Text style={{ fontSize, color }}>{reservation.name}</Text>
-                <Avatar source={baseImage.image_url ? { uri: baseImage.image_url } : {}} size={64} rounded></Avatar> */}
-                {/* <Card> */}
 
-                    <View style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        backgroundColor: 'white',
-                        justifyContent: 'space-around'
-                    }}>
-                        <Text style={{fontSize, color}}>{reservation.name}</Text>
-                        <Avatar source={baseImage.image_url ? { uri: baseImage.image_url } : {}} size={64} rounded></Avatar>
-                    </View>
+                <View style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                    backgroundColor: backgroundColor,
+                }}>
+                    <Text style={{ fontSize: 16, color: 'black', backgroundColor }}>{reservation.name}</Text>
+                    <Avatar source={reservation.picture ? { uri: reservation.picture } : {}} size={64} rounded></Avatar>
+                </View>
                 {/* </Card> */}
 
             </TouchableOpacity>
@@ -114,9 +105,19 @@ export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Sche
     const renderEmptyDate = () => {
         return (
             <View style={styles.emptyDate}>
-                <Text>Parece que não há agendas</Text>
+                <ActivityIndicator size="large" color="#ffffff" />
             </View>
         )
+    }
+
+    const today = (): string => {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        const endDate = mm + '/' + dd + '/' + yyyy;
+        return endDate.toString();
     }
 
     return (
@@ -124,7 +125,7 @@ export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Sche
             testID={testIds.agenda.CONTAINER}
             items={Items}
             loadItemsForMonth={loadItems}
-            selected={'2022-04-29'}
+            selected={today()}
             renderItem={renderItem}
             renderEmptyData={renderEmptyDate}
             rowHasChanged={rowHasChanged}
@@ -132,36 +133,18 @@ export default function SchedulerScreen({ navigation }: RootTabScreenProps<'Sche
         >
 
         </Agenda>
-    )
-
-    // return (
-    //     <View style={styles.container}>
-    //         <Agenda
-    //             items={Items}
-    //             loadItemsForMonth={loadItems}
-    //             renderItem={renderItem}
-    //             selected={'2022-04-29'}
-    //             rowHasChanged={rowHasChanged}
-    //         />
-    //     </View>
-    // );
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    item: {
-        backgroundColor: 'white',
-        flex: 1,
-        borderRadius: 5,
-        padding: 10,
-        marginRight: 10,
-        marginTop: 17
-    },
     emptyDate: {
         height: 15,
         flex: 1,
-        paddingTop: 30
+        paddingTop: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
     }
 });

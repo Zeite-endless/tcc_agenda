@@ -12,7 +12,7 @@ import { ColorSchemeName, Pressable } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import ModalScreen from '../screens/ModalScreen';
+import ModalScreen from '../components/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import InitialPage from '../screens/InitialPage';
 import FriendListScreen from '../screens/friendListScreen';
@@ -21,10 +21,11 @@ import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../typ
 import LinkingConfiguration from './LinkingConfiguration';
 
 import LoginScreen from '../screens/LoginScreen';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Avatar } from 'react-native-elements';
 import { StyleSheet } from 'react-native';
 import { useEffect } from 'react';
+import UserProfilePage from "../screens/UserProfilePage";
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -80,19 +81,28 @@ function BottomTabNavigator() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
       }}>
+
       <BottomTab.Screen
         name="InitialPage"
         component={InitialPage}
         options={({ navigation }: RootTabScreenProps<'InitialPage'>) => ({
-          title: 'Home',
-          tabBarIcon: ({ color }: any) => <TabBarIcon name="home" color={color} />,
+          title: 'Conexões',
+          tabBarIcon: ({ color }: any) => <TabBarIcon name="connectdevelop" color={color} />,
           headerRight: () => (
-            <Avatar 
-            source={{uri: user.userData.picture ? user.userData.picture 
-            : 'https://cdn-icons-png.flaticon.com/512/147/147140.png'}} 
-            size={36}
-            rounded
-            containerStyle={style.avatar} >
+            <Avatar
+              source={{
+                uri: user.userData.picture ? user.userData.picture
+                  : 'https://cdn-icons-png.flaticon.com/512/147/147140.png'
+              }}
+              size={36}
+              rounded
+              containerStyle={style.avatar}
+              
+              onPress={() => {
+                navigation.navigate('UserProfile');
+              }}
+              
+              >
 
             </Avatar>
           ),
@@ -103,15 +113,26 @@ function BottomTabNavigator() {
         name="Scheduler"
         component={SchedulerScreen}
         options={({ navigation }: RootTabScreenProps<'Scheduler'>) => ({
+          onclick: () =>{
+            navigation.navigate('UserProfile');
+          },
           title: 'Agenda',
           tabBarIcon: ({ color }: any) => <TabBarIcon name="calendar" color={color} />,
           headerRight: () => (
-            <Avatar 
-            source={{uri: user.userData.picture ? user.userData.picture 
-            : 'https://cdn-icons-png.flaticon.com/512/147/147140.png'}} 
-            size={36}
-            rounded
-            containerStyle={style.avatar} >
+            <Avatar
+              source={{
+                uri: user.userData.picture ? user.userData.picture
+                  : 'https://cdn-icons-png.flaticon.com/512/147/147140.png'
+              }}
+              size={36}
+              rounded
+              containerStyle={style.avatar} 
+              
+              onPress={() => {
+                navigation.navigate('UserProfile');
+              }}
+              
+              >
 
             </Avatar>
           )
@@ -121,22 +142,42 @@ function BottomTabNavigator() {
       <BottomTab.Screen
         name="FriendList"
         component={FriendListScreen}
-        options={{
-          title: 'Nova Agenda',
-          tabBarIcon: ({ color }: any) => <TabBarIcon  name="plus" color={color} />,
+        options={({navigation }: RootTabScreenProps<'FriendList'>) => ({	
+          onclick: () =>{
+            navigation.navigate('UserProfile');
+          },
+          title: 'Solicitações',
+          tabBarIcon: ({ color }: any) => <TabBarIcon name="plus" color={color} />,
           headerRight: () => (
-            <Avatar 
-            source={{uri: user.userData.picture ? user.userData.picture 
-            : 'https://cdn-icons-png.flaticon.com/512/147/147140.png'}} 
-            size={36}
-            rounded
-            containerStyle={style.avatar} >
+            <Avatar
+              source={{
+                uri: user.userData.picture ? user.userData.picture
+                  : 'https://cdn-icons-png.flaticon.com/512/147/147140.png'
+              }}
+              size={36}
+              rounded
+              containerStyle={style.avatar}
 
+              onPress={() => {
+                navigation.navigate('UserProfile');
+              }}
+
+              >
+                
             </Avatar>
+            
           )
-        }}
+        })}
       />
-
+      <BottomTab.Screen
+        name="UserProfile"
+        component={UserProfilePage}
+        options={({ navigation }: RootTabScreenProps<'UserProfile'>) => ({
+          title: "Perfil",
+          tabBarIcon: ({ color }: any) => <TabBarIcon name="heart" color={color} />,
+          
+        })}
+      />
 
     </BottomTab.Navigator>
   );
