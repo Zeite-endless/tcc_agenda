@@ -1,4 +1,5 @@
-import { Alert, Platform, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { Alert, Platform, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { useSelector } from 'react-redux';
 import { View, Text } from '../components/Themed';
@@ -7,7 +8,6 @@ export default function FriendListScreen() {
 
 
   const userObj = useSelector((state: any) => state.userInfo);
-  console.log(userObj)
 
   return (
     <View style={styles.container}>
@@ -19,7 +19,7 @@ export default function FriendListScreen() {
         {
           userObj.userData.picture &&
 
-          <View>
+          <SafeAreaView style={styles.container}>
             {Platform.OS == 'ios' ?
               <TouchableOpacity onPress={alert} style={styles.askAcceptiOS}>
                 <Text style={{ textAlign: 'center' }}>Parece que <Text style={styles.span}>{userObj.userData.name}</Text> está tentando adicioná-lo a sua rede de conexões</Text>
@@ -33,7 +33,7 @@ export default function FriendListScreen() {
 
             }
 
-          </View>
+          </SafeAreaView>
 
         }
       </View>

@@ -12,10 +12,10 @@ import { ColorSchemeName, Pressable } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import ModalScreen from '../components/ModalScreen';
+import ModalScreen from '../components/ModalAddFriends';
 import NotFoundScreen from '../screens/NotFoundScreen';
-import InitialPage from '../screens/InitialPage';
-import FriendListScreen from '../screens/friendListScreen';
+import InitialPage from '../screens/conections';
+import FriendListScreen from '../screens/askedFriedship';
 import SchedulerScreen from '../screens/SchedulerScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -26,6 +26,7 @@ import { Avatar } from 'react-native-elements';
 import { StyleSheet } from 'react-native';
 import { useEffect } from 'react';
 import UserProfilePage from "../screens/UserProfilePage";
+import MyAgenda from '../screens/MyAgenda';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -97,12 +98,12 @@ function BottomTabNavigator() {
               size={36}
               rounded
               containerStyle={style.avatar}
-              
+
               onPress={() => {
                 navigation.navigate('UserProfile');
               }}
-              
-              >
+
+            >
 
             </Avatar>
           ),
@@ -113,7 +114,7 @@ function BottomTabNavigator() {
         name="Scheduler"
         component={SchedulerScreen}
         options={({ navigation }: RootTabScreenProps<'Scheduler'>) => ({
-          onclick: () =>{
+          onclick: () => {
             navigation.navigate('UserProfile');
           },
           title: 'Agenda',
@@ -126,13 +127,43 @@ function BottomTabNavigator() {
               }}
               size={36}
               rounded
-              containerStyle={style.avatar} 
-              
+              containerStyle={style.avatar}
+
               onPress={() => {
                 navigation.navigate('UserProfile');
               }}
-              
-              >
+
+            >
+
+            </Avatar>
+          )
+        })}
+      />
+
+      <BottomTab.Screen
+        name="MyAgenda"
+        component={MyAgenda}
+        options={({ navigation }: RootTabScreenProps<'MyAgenda'>) => ({
+          onclick: () => {
+            navigation.navigate('MyAgenda');
+          },
+          title: 'Minha Agenda',
+          tabBarIcon: ({ color }: any) => <TabBarIcon name="map" color={color} />,
+          headerRight: () => (
+            <Avatar
+              source={{
+                uri: user.userData.picture ? user.userData.picture
+                  : 'https://cdn-icons-png.flaticon.com/512/147/147140.png'
+              }}
+              size={36}
+              rounded
+              containerStyle={style.avatar}
+
+              onPress={() => {
+                navigation.navigate('UserProfile');
+              }}
+
+            >
 
             </Avatar>
           )
@@ -142,8 +173,8 @@ function BottomTabNavigator() {
       <BottomTab.Screen
         name="FriendList"
         component={FriendListScreen}
-        options={({navigation }: RootTabScreenProps<'FriendList'>) => ({	
-          onclick: () =>{
+        options={({ navigation }: RootTabScreenProps<'FriendList'>) => ({
+          onclick: () => {
             navigation.navigate('UserProfile');
           },
           title: 'Solicitações',
@@ -162,10 +193,10 @@ function BottomTabNavigator() {
                 navigation.navigate('UserProfile');
               }}
 
-              >
-                
+            >
+
             </Avatar>
-            
+
           )
         })}
       />
@@ -175,7 +206,7 @@ function BottomTabNavigator() {
         options={({ navigation }: RootTabScreenProps<'UserProfile'>) => ({
           title: "Perfil",
           tabBarIcon: ({ color }: any) => <TabBarIcon name="heart" color={color} />,
-          
+
         })}
       />
 

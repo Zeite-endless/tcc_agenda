@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 // import { Button } from 'react-native-elements/dist/buttons/Button';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
-import { NotFriends } from '../components/NotFriends';
+import { NotFriends } from './NotFriends';
 import { useSelector } from 'react-redux';
 
 import { Avatar, Card } from 'react-native-elements';
