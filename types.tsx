@@ -33,7 +33,8 @@ export type RootTabParamList = {
   UserProfile: undefined;
   Scheduler: undefined;
   Login: undefined;
-  MyAgenda: undefined;
+  MyAgendaControl: undefined;
+  askedFriendshipControl: undefined;
 };
 
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<

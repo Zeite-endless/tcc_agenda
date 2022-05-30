@@ -4,13 +4,18 @@ import { Text, View } from './Themed';
 import { Audio } from 'expo-av';
 import { Avatar, Icon } from 'react-native-elements';
 import { useSelector } from 'react-redux';
-import deleteConnection from '../store/api/connection/deleteConnections';
+import declineConnection from '../store/api/connection/declineConnection';
+import acceptConnectionID from '../store/api/connection/acceptConnection';
 
-export default function ModalFriend({ visibility, setVisibility, friend }: any) {
+export default function ModalAcceptFriend({ visibility, setVisibility, conn }: any) {
 
     const [sound, setSound] = useState({});
     const user = useSelector((state: any) => state.user.userData);
-    
+
+    if(Object.keys(conn).length == 0){
+        setVisibility(false);
+    }
+
     const setToThirdDigits = (name: string) => {
         if(name != undefined){
             if (name.length < 30) {
@@ -21,28 +26,51 @@ export default function ModalFriend({ visibility, setVisibility, friend }: any) 
         }
     }
 
-    // substring to five first
-    const spliceConn = (id: string) => {
-        if(id != undefined){
-            return id.substring(0, 5);
-        }
-    }
 
-
-    const excludeFriend = async (name: any) => {
+    const excludeFriend = async (name: any, id: any) => {
         
         Alert.alert("Excluir Conexão:", `Tem certeza que deseja excluir a conexão com ${name}?`, [
             {
                 text: "Cancelar",
                 onPress: async() => {
-                    deleteConnection(friend.id, user.id, friend.idGoogle)
+                    return;
                 },
                 style: "cancel"
             },
             {
                 text: "Confirmar",
                 onPress: async() => {
-                    return
+                    declineConnection("trocar", id, user.id);
+                    Alert.alert("Conexão recusada!")
+                    setTimeout(() => {
+
+                        setVisibility(false);
+                    }, 2000)
+                }
+            }
+        ],
+            { cancelable: false });
+    }
+
+    const acceptConnection = async (name: any, id: any) => {
+        
+        Alert.alert("Excluir Conexão:", `Tem certeza que deseja excluir a conexão com ${name}?`, [
+            {
+                text: "Cancelar",
+                onPress: async() => {
+                    return;
+                },
+                style: "cancel"
+            },
+            {
+                text: "Confirmar",
+                onPress: async() => {
+                    acceptConnectionID("trocar", id, user.id);
+                    Alert.alert("Conexão recusada!")
+                    setTimeout(() => {
+
+                        setVisibility(false);
+                    }, 2000)
                 }
             }
         ],
@@ -55,7 +83,7 @@ export default function ModalFriend({ visibility, setVisibility, friend }: any) 
     
         <View style={styles.container}>
             {
-                friend != undefined &&
+                conn != undefined &&
 
             <Modal
                 animationType={"slide"}
@@ -67,22 +95,22 @@ export default function ModalFriend({ visibility, setVisibility, friend }: any) 
                 }}>
                 <View style={styles.container}>
                     {
-                        friend.picture != undefined ?
-                        <Avatar source={{ uri: friend.picture.medium }} size={150} rounded></Avatar>
+                        conn.picture != undefined ?
+                        <Avatar source={{ uri: conn.picture }} size={150} rounded></Avatar>
                         :
                         <Avatar source={require("../assets/images/user.png")} size={150} rounded></Avatar>
                     }
 
-                    <Text style={styles.header}>{setToThirdDigits(friend.name.first + " " + friend.name.last)}</Text>
+                    <Text style={styles.header}>{setToThirdDigits(conn.name)}</Text>
 
                     <View style={styles.inputArea}>
                         <Text style={styles.inputAreaFont}>E-mail da conexão: </Text>
-                        <Text style={[styles.input, { color: "#2e99b6" }]}>{friend.email}</Text>
+                        <Text style={[styles.input, { color: "#2e99b6" }]}>{conn.email}</Text>
                     </View>
 
                     <View style={styles.inputArea}>
                         <Text style={styles.inputAreaFont}>ID de conexão: </Text>
-                        <Text style={[styles.input, { color: "pink" }]}>{spliceConn(friend.login.uuid)}</Text>
+                        <Text style={[styles.input, { color: "pink" }]}>{conn.connectionString}</Text>
                     </View>
 
                     <View style={{ display: 'flex', flexDirection: 'row', margin: 10 }}>
@@ -96,7 +124,7 @@ export default function ModalFriend({ visibility, setVisibility, friend }: any) 
                             underlayColor={'rgb(50, 255, 0)'}
                             iconStyle={{ color: "black" }}
                             type="material-community"
-                            onPress={() => { excludeFriend(friend.name.first + " " + friend.name.last) }}
+                            onPress={() => { excludeFriend(conn.name, conn.id) }}
                         />
                         <Icon
                             raised
@@ -107,7 +135,7 @@ export default function ModalFriend({ visibility, setVisibility, friend }: any) 
                             underlayColor={'rgb(50, 255, 0)'}
                             iconStyle={{ color: "black" }}
                             type="material-community"
-                            onPress={() => { setVisibility(false) }}
+                            onPress={() => { acceptConnection(conn.name, conn.id) }}
                         />
                     </View>
 
@@ -130,6 +158,7 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     input: {
+        borderWidth: 1,
         color: "white",
         padding: 5,
         margin: 5,
@@ -160,9 +189,7 @@ const styles = StyleSheet.create({
         backgroundColor: "black",
         fontSize: 16,
         textAlign: "center",
-        alignItems: "center",
-        margin: 10,
-        padding: 10
+        alignItems: "center"
     },
     inputAreaFont: {
         fontSize: 16,
@@ -171,4 +198,3 @@ const styles = StyleSheet.create({
         fontSize: 50,
     },
 });
-

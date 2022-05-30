@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Image, Modal, Button, Platform, Vibration, TextInput, TouchableOpacity } from 'react-native';
 import { Text, View } from './Themed';
 import {Audio} from 'expo-av';
+import solicitarConexao from '../store/api/connection/solicitarConexao';
+import { useSelector } from 'react-redux';
 
 export default function ModalAddFriendsScreen({ visibility, setVisibility }: any) {
 
@@ -11,52 +13,42 @@ export default function ModalAddFriendsScreen({ visibility, setVisibility }: any
   const [connectionString, setConnectionString] = useState("");
   const [colorB, setColorB] = useState("white");
   const [sound, setSound] = useState({});
-
+  const user = useSelector((state: any) => state.user.userData);
   
 
   const saveConnection = async() => {
 
-    const {sound} = await Audio.Sound.createAsync(
+    var {sound} = await Audio.Sound.createAsync(
       require("../assets/sounds/popupfalse.wav"),
     )
 
     setSound(sound);
 
-    
-    if (email == "otaviobarros777@gmail.com" && connectionString == "123") {
-      const {sound} = await Audio.Sound.createAsync(
-        require("../assets/sounds/popupok.wav"),
-      )
-  
-      setSound(sound);
-      setColorB("green");
-      Alert.alert("Conexão feita com sucesso:", "Pedido de conexão enviado com sucesso!");
-      setTimeout(() => {
-        setColorB("white");
-        setVisibility(false);
-      }, 3000);
-      await sound.playAsync();
-    } else if (email == "" || connectionString == "") {
-     
-      Alert.alert("Falha ao conectar: ","Preencha os campos conforme solicitado!")
-      setColorB("red");
-      Vibration.vibrate();
-      await sound.playAsync();
-    } else if (email == "otaviobarros777@gmail.com" && connectionString != "123") {
-      Alert.alert("Falha ao conectar: ", "Parece que as credenciais de conexão não batem! Verifique e tente novamente...")
-      setColorB("red");
-      Vibration.vibrate();
-      await sound.playAsync();
-    } else if (email != "otaviobarros777gmail.com" && connectionString == "123") {
-      Alert.alert("Falha ao conectar: ", "Parece que as credenciais de conexão não batem! Verifique e tente novamente...");
-      setColorB("red");
-      Vibration.vibrate();
-      await sound.playAsync();
-    } else if (email != "otaviobarros777gmail.com" && connectionString != "123") {
-      Alert.alert("Falha ao conectar: ", "Credenciais não encontradas!")
-      setColorB("red");
-      Vibration.vibrate();
-      await sound.playAsync();
+    if (email == "") {
+      Alert.alert("Erro", "Preencha o campo email!");
+      sound.playAsync();
+    }
+    else if (connectionString == "") {
+      Alert.alert("Erro", "Preencha o campo nome!");
+      sound.playAsync();
+    }
+    else {
+      try{
+
+        solicitarConexao(user.id, user.name, user.email, connectionString);
+        var {sound} = await Audio.Sound.createAsync(
+          require("../assets/sounds/popupok.wav")
+        );
+        setSound(sound);
+        sound.playAsync();
+        setTimeout(() => {
+          
+          setVisibility(false);
+        }, 2000);
+      } catch(e: any){
+        Alert.alert("Erro", e.message);
+        sound.playAsync();
+      }
     }
   }
 

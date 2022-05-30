@@ -8,14 +8,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName, Pressable } from 'react-native';
+import { ColorSchemeName } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../components/ModalAddFriends';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import InitialPage from '../screens/conections';
-import FriendListScreen from '../screens/askedFriedship';
+import FriendListScreen from '../screens/askedFriendship';
 import SchedulerScreen from '../screens/SchedulerScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -26,7 +26,8 @@ import { Avatar } from 'react-native-elements';
 import { StyleSheet } from 'react-native';
 import { useEffect } from 'react';
 import UserProfilePage from "../screens/UserProfilePage";
-import MyAgenda from '../screens/MyAgenda';
+import MyAgendaControl from '../screens/myAgendaControl';
+import AskedFriendshipControl from '../screens/askedFriendshipControl';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -73,6 +74,7 @@ function BottomTabNavigator() {
   const colorScheme = useColorScheme();
 
   const user = useSelector((state: any) => state.userInfo);
+
   useEffect(() => {
   }, [user]);
 
@@ -141,11 +143,11 @@ function BottomTabNavigator() {
       />
 
       <BottomTab.Screen
-        name="MyAgenda"
-        component={MyAgenda}
-        options={({ navigation }: RootTabScreenProps<'MyAgenda'>) => ({
+        name="MyAgendaControl"
+        component={MyAgendaControl}
+        options={({ navigation }: RootTabScreenProps<'MyAgendaControl'>) => ({
           onclick: () => {
-            navigation.navigate('MyAgenda');
+            navigation.navigate('MyAgendaControl');
           },
           title: 'Minha Agenda',
           tabBarIcon: ({ color }: any) => <TabBarIcon name="map" color={color} />,
@@ -171,9 +173,9 @@ function BottomTabNavigator() {
       />
 
       <BottomTab.Screen
-        name="FriendList"
-        component={FriendListScreen}
-        options={({ navigation }: RootTabScreenProps<'FriendList'>) => ({
+        name="askedFriendshipControl"
+        component={AskedFriendshipControl}
+        options={({ navigation }: RootTabScreenProps<'askedFriendshipControl'>) => ({
           onclick: () => {
             navigation.navigate('UserProfile');
           },

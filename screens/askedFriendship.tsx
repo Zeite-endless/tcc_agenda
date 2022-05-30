@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Platform, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { Avatar, Icon } from 'react-native-elements';
-import ModalFriend from '../components/ModalFriend';
-import ModalAddFriendsScreen from '../components/ModalAddFriends';
+import { Platform, TouchableOpacity, StyleSheet } from 'react-native';
+import { Avatar } from 'react-native-elements';
+import ModalAcceptFriend from '../components/ModalAcceptConnection';
 import { View, Text } from '../components/Themed';
 
-export default function FriendList({ friends }: any) {
+export default function AskedFriendship({ conn }: any) {
 
-    const [modalFriend, setModalFriend] = useState(false);
-    const [modalAddFriend, setModalAddFriend] = useState(false);
-    const [friend, setFriend] = useState({});
+
+    const [connection, setConnection] = useState(conn);
+    const [ modalAcceptConnection, setModalAcceptConnection ] = useState(false);
+
 
     const setToThirdDigits = (name: string) => {
         if (name.length < 30) {
@@ -19,19 +19,25 @@ export default function FriendList({ friends }: any) {
         }
     }
 
-    const friends_list = friends.map((data: any, id: number) => {
+    const conn_list = conn.map((data: any, id: number) => {
         return <View key={id}>
             {Platform.OS == 'ios' ?
                 <TouchableOpacity onPress={() => {
-                        setFriend({id: id, data: data})
-                        }} style={styles.askAcceptiOS}>
+                    setConnection(data);
+                    if (connection != undefined) {
+                        setModalAcceptConnection(true)
+                    }
+                }} style={styles.askAcceptiOS}>
                     <Text style={styles.span}>{setToThirdDigits(data.name)}</Text>
                     <Avatar source={{ uri: data.picture }} size={64} rounded></Avatar>
                 </TouchableOpacity> :
 
                 <TouchableOpacity onPress={() => {
-                    setFriend({id: id, data: data})
-                    }} style={styles.askAcceptAndroid}>
+                    setConnection(data);
+                    if (connection != undefined) {
+                        setModalAcceptConnection(true)
+                    }
+                }} style={styles.askAcceptAndroid}>
                     <Text style={styles.span}>{setToThirdDigits(data.name)}</Text>
                     <Avatar source={{ uri: data.picture }} size={64} rounded></Avatar>
                 </TouchableOpacity>
@@ -41,24 +47,10 @@ export default function FriendList({ friends }: any) {
 
     return (
         <View>
-            {friends_list}
-            <ModalAddFriendsScreen visibility={modalAddFriend} setVisibility={setModalAddFriend} />
-            <ModalFriend visibility={modalFriend} setVisibility={setModalFriend} friend={friend} />
-            <View style={styles.btn_place_top}>
-                <Icon
-                    raised
-                    reverse
-                    // reverseColor
-                    name="account-multiple-plus"
-                    color="rgb(50, 255, 0)"
-                    underlayColor={'rgb(50, 255, 0)'}
-                    iconStyle={{color: "black"}}
-                    type="material-community"
-                    onPress={() => { setModalAddFriend(true) }}
-                />
-            </View>
-
-
+            {
+                conn_list
+            }
+            <ModalAcceptFriend visibility={modalAcceptConnection} setVisibility={setModalAcceptConnection} conn={connection}></ModalAcceptFriend>
         </View>
     )
 }
