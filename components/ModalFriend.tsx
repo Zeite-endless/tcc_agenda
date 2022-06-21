@@ -4,12 +4,12 @@ import { Text, View } from './Themed';
 import { Audio } from 'expo-av';
 import { Avatar, Icon } from 'react-native-elements';
 import { useSelector } from 'react-redux';
-import deleteConnection from '../store/api/connection/deleteConnections';
+import ngrok_URL from '../store/ngrok';
 
 export default function ModalFriend({ visibility, setVisibility, friend }: any) {
 
     const [sound, setSound] = useState({});
-    const user = useSelector((state: any) => state.user.userData);
+    const user = useSelector((state: any) => state.userInfo);
     
     const setToThirdDigits = (name: string) => {
         if(name != undefined){
@@ -28,6 +28,19 @@ export default function ModalFriend({ visibility, setVisibility, friend }: any) 
         }
     }
 
+    const excluirConexao = (connectionId: number, idGoogleSolicitante: number, idGoogleSolicitado: number) => {
+        var fetchString = `${ngrok_URL}/api/Conexao/DeletaConexao/${connectionId}/${idGoogleSolicitante}/${idGoogleSolicitado}`;
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+
+        var init = {
+            method: "DELETE",
+            headers: headers,
+        }
+
+        return fetch(fetchString, init);
+    }
+
 
     const excludeFriend = async (name: any) => {
         
@@ -35,14 +48,14 @@ export default function ModalFriend({ visibility, setVisibility, friend }: any) 
             {
                 text: "Cancelar",
                 onPress: async() => {
-                    deleteConnection(friend.id, user.id, friend.idGoogle)
+                    return
                 },
                 style: "cancel"
             },
             {
                 text: "Confirmar",
                 onPress: async() => {
-                    return
+                    excluirConexao(1, 2, 3);
                 }
             }
         ],
@@ -55,16 +68,13 @@ export default function ModalFriend({ visibility, setVisibility, friend }: any) 
     
         <View style={styles.container}>
             {
-                friend != undefined &&
+            friend != undefined &&
 
             <Modal
                 animationType={"slide"}
                 transparent={true}
                 visible={visibility}
-                onRequestClose={() => {
-                    Alert.alert('O Modal foi fechado!');
-                    setVisibility(false);
-                }}>
+               >
                 <View style={styles.container}>
                     {
                         friend.picture != undefined ?
@@ -96,7 +106,7 @@ export default function ModalFriend({ visibility, setVisibility, friend }: any) 
                             underlayColor={'rgb(50, 255, 0)'}
                             iconStyle={{ color: "black" }}
                             type="material-community"
-                            onPress={() => { excludeFriend(friend.name.first + " " + friend.name.last) }}
+                            onPress={() => { excludeFriend(friend.name) }}
                         />
                         <Icon
                             raised

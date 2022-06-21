@@ -1,14 +1,14 @@
-import React from 'react';
-import { Alert, StyleSheet, Modal } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, StyleSheet, Modal, ScrollView } from 'react-native';
 import { Icon } from 'react-native-elements';
-import deleteAgenda from '../store/api/agenda/deleteAgenda';
+import { useSelector } from 'react-redux';
+import ngrok_URL from '../store/ngrok';
 import { Text, View } from './Themed';
 
 export default function ModalAgenda({ visibility, setVisibility, agenda }: any) {
-    if (agenda == undefined) {
-        setVisibility(false);
-    }
 
+    const [sound, setSound] = useState({});
+    const user = useSelector((state: any) => state.userInfo);
 
     const setToThirdDigits = (title: string) => {
         if (title != undefined) {
@@ -28,7 +28,7 @@ export default function ModalAgenda({ visibility, setVisibility, agenda }: any) 
     }
 
 
-    const excludeAgenda = async (title: any) => {
+    const excludeAgenda = async (title: string, id: string) => {
 
         Alert.alert("Excluir Conexão:", `Tem certeza que deseja excluir ${title}?`, [
             {
@@ -41,7 +41,22 @@ export default function ModalAgenda({ visibility, setVisibility, agenda }: any) 
             {
                 text: "Confirmar",
                 onPress: async () => {
-                    deleteAgenda(agenda.id)
+
+                    var headers = new Headers();
+
+                    headers.append("Accept", "application/json");
+                    headers.append("Content-Type", "application/json");
+
+                    const requestOptions = {
+                        method: 'DELETE',
+                        headers: headers
+                    };
+
+                    fetch(`${ngrok_URL}/api/Agenda/DeletaAgendaPorIdAgenda/${id}`, requestOptions)
+                    Alert.alert("Agenda deletada!");
+                    setTimeout(() => {
+                        setVisibility(false);
+                    }, 2000)
                 }
             }
         ],
@@ -52,18 +67,14 @@ export default function ModalAgenda({ visibility, setVisibility, agenda }: any) 
 
     return (
 
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             {
                 agenda != undefined &&
-
                 <Modal
                     animationType={"slide"}
                     transparent={true}
                     visible={visibility}
-                    onRequestClose={() => {
-                        Alert.alert('O Modal foi fechado!');
-                        setVisibility(false);
-                    }}>
+                   >
                     <View style={styles.container}>
                         {/* {
                         agenda.picture != undefined ?
@@ -73,16 +84,16 @@ export default function ModalAgenda({ visibility, setVisibility, agenda }: any) 
                     } */}
 
                         <Text style={styles.con}>&#128197;</Text>
-                        <Text style={styles.header}>{setToThirdDigits(agenda.title)}</Text>
+                        <Text style={styles.header}>{setToThirdDigits(agenda.titulo)}</Text>
 
                         <View style={styles.inputArea}>
                         <Text style={styles.inputAreaFont}>Data da Agenda: </Text>
-                        <Text style={[styles.input, { color: "#2e99b6" }]}>{setToLocaleDateString(agenda.date)}</Text>
+                        <Text style={[styles.input, { color: "#2e99b6" }]}>{setToLocaleDateString(agenda.dt_Fim)}</Text>
                     </View>
 
                     <View style={styles.inputArea}>
                         <Text style={styles.inputAreaFont}>Descrição da Agenda: </Text>
-                        <Text style={[styles.input, { color: "pink" }]}>{agenda.description}</Text>
+                        <Text style={[styles.input, { color: "pink" }]}>{agenda.descricao}</Text>
                     </View>
 
                     <View style={{ display: 'flex', flexDirection: 'row', margin: 10 }}>
@@ -96,7 +107,7 @@ export default function ModalAgenda({ visibility, setVisibility, agenda }: any) 
                             underlayColor={'rgb(50, 255, 0)'}
                             iconStyle={{ color: "black" }}
                             type="material-community"
-                            onPress={() => { excludeAgenda(agenda.title) }}
+                            onPress={() => { excludeAgenda(agenda.titulo, agenda.id_Agenda) }}
                         />
                         <Icon
                             raised
@@ -114,7 +125,7 @@ export default function ModalAgenda({ visibility, setVisibility, agenda }: any) 
                     </View>
                 </Modal>
             }
-        </View>
+        </ScrollView>
     );
 }
 
@@ -123,11 +134,11 @@ export default function ModalAgenda({ visibility, setVisibility, agenda }: any) 
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: "black",
-        textAlign: "center"
+        paddingTop: 125,
+        paddingBottom: 225
     },
     input: {
         borderWidth: 1,

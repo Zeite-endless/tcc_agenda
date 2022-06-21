@@ -3,20 +3,44 @@ import { Alert, StyleSheet, Modal, Platform, TextInput, TouchableOpacity, SafeAr
 import { Text, View } from './Themed';
 import { Audio } from 'expo-av';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import addAgenda from '../store/api/agenda/addAgenda';
 import { useSelector } from 'react-redux';
+import ngrok_URL from '../store/ngrok';
 
 export default function ModalAddAgenda({ visibility, setVisibility }: any) {
 
   const [dateEvent, setDateEvent] = useState(new Date());
 
+  // var user = useSelector((state: any) => state.userInfo);
+  const user = useSelector((state: any) => state.userInfo);
+
+  const addAgenda = (email: any, titulo: string, descricao: string, data: Date) => {
+    const data_event = {
+      titulo: titulo,
+      descricao: descricao,
+      dt_Fim: data
+    }
+
+    var headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    var init = {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(data_event)
+    }
+
+    fetch(`${ngrok_URL}/api/Usuario/ProcuraUsuario/${email}`).then((res) => res.json()).then((res) => {
+      console.log(res[0])
+      fetch(`${ngrok_URL}/api/Agenda/AdicionaAgenda/${res[0].id_Usuario}/${res[0].id_Google}/${encodeURIComponent(res[0].email)}/${encodeURIComponent(res[0].nome)}`, init).then((res) => res.json()).then((res) => console.log(res))
+    })
+
+  }
+
   const onChange = (event: any, selectedDate: any) => {
     const currentDate = selectedDate;
-    console.log(currentDate)
     setDateEvent(currentDate);
   };
 
-  const user = useSelector((state: any) => state.user.userInfo);
   const [tituloString, setTituloString] = useState("");
   const [descriptionString, setDescriptionString] = useState("");
 
@@ -24,8 +48,12 @@ export default function ModalAddAgenda({ visibility, setVisibility }: any) {
     if (tituloString == "" || descriptionString == "") {
       Alert.alert("Erro", "Preencha todos os campos!");
     } else {
-      addAgenda(user.id, user.id, user.email, user.name, tituloString, descriptionString, dateEvent.toString());
-      setVisibility(false);
+      addAgenda(user.userData.email, tituloString, descriptionString, dateEvent);
+      Alert.alert("Agenda Criada com Sucesso!");
+      setTimeout(() => {
+        setVisibility(false);
+      }, 2000)
+      // setVisibility(false);
     }
   }
 
@@ -73,8 +101,8 @@ export default function ModalAddAgenda({ visibility, setVisibility }: any) {
                 style={styles.btn}
 
                 onPress={() => {
-                  saveAgenda();
-                  // setVisibility(false);
+                  // saveAgenda();
+                  setVisibility(false);
                 }}
 
               >
@@ -83,7 +111,7 @@ export default function ModalAddAgenda({ visibility, setVisibility }: any) {
               <TouchableOpacity
                 style={styles.btn}
                 onPress={() => {
-                  setVisibility(false);
+                  saveAgenda();
                   // setVisibility(false);
                 }}>
                 <Text style={{ color: 'green', fontSize: 20 }}>Confirmar</Text>
@@ -101,12 +129,11 @@ export default function ModalAddAgenda({ visibility, setVisibility }: any) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   scrollView: {
-    width: '90%',
+    width: '100%',
     height: "200%",
     marginTop: 20,
     alignSelf: 'center',

@@ -6,6 +6,7 @@ import { Text, View } from "../components/Themed";
 import { turnTrue } from '../store/user/userState';
 import { useDispatch } from 'react-redux';
 import { saveToUser } from '../store/services';
+import ngrok_URL from "../store/ngrok";
 
 
 const LoginScreen = ({ navigation }: RootTabScreenProps<'Login'>) => {
@@ -16,16 +17,16 @@ const LoginScreen = ({ navigation }: RootTabScreenProps<'Login'>) => {
         androidClientId: '695950178174-kaa2mfa2c5cajskfrn5knbcsl979jaff.apps.googleusercontent.com',
         scopes: ['profile', 'email'],
     });
-    
+
     getLogin(response);
-    
+
     return (
         <SafeAreaView style={styles.container}>
             <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/284/284301.png' }} style={styles.logo}>
 
             </Image>
             <TouchableOpacity style={styles.btn} disabled={!request} onPress={() => {
-                promptAsync({ showInRecents: false  });
+                promptAsync({ showInRecents: false });
             }}>
                 <Image source={{ uri: 'https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004_960_720.png' }} style={{ width: 50, height: 50 }}></Image>
                 <Text>Login com Google</Text>
@@ -42,7 +43,17 @@ const getLogin = (props: any) => {
             let accessToken = props.authentication.accessToken;
             let data = getUserInformation(accessToken);
             data.then(result => {
-                dispatch(saveToUser(result));
+                try {
+                    dispatch(saveToUser(result));
+                    fetch(`${ngrok_URL}/api/Usuario/AdicionaUsuario/${result.id.substring(0, 5)}/${result.email}/${encodeURIComponent(result.name)}/${encodeURIComponent(result.picture)}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                } catch (e: any) {
+                    console.log(e.message);
+                }
             })
             dispatch(turnTrue());
         }

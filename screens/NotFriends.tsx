@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     separator: {
-        marginVertical: 30,
+        marginVertical: 20,
         height: 1,
         width: '80%',
     },

@@ -4,17 +4,12 @@ import { Text, View } from './Themed';
 import { Audio } from 'expo-av';
 import { Avatar, Icon } from 'react-native-elements';
 import { useSelector } from 'react-redux';
-import declineConnection from '../store/api/connection/declineConnection';
-import acceptConnectionID from '../store/api/connection/acceptConnection';
+import ngrok_URL from '../store/ngrok';
 
 export default function ModalAcceptFriend({ visibility, setVisibility, conn }: any) {
 
     const [sound, setSound] = useState({});
-    const user = useSelector((state: any) => state.user.userData);
-
-    if(Object.keys(conn).length == 0){
-        setVisibility(false);
-    }
+    const user = useSelector((state: any) => state.userInfo);
 
     const setToThirdDigits = (name: string) => {
         if(name != undefined){
@@ -26,6 +21,32 @@ export default function ModalAcceptFriend({ visibility, setVisibility, conn }: a
         }
     }
 
+    const aceitarConexao = () => {
+        var fetchString = `${ngrok_URL}/api/Conexao/AceitarConexao/${conn.id_Google_Solicitado_FK}/${user.userData.id}`;
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+
+        var init = {
+            method: "PUT",
+            headers: headers,
+        }
+
+        return fetch(fetchString, init);
+    }
+
+    const recusarConexao = () => {
+        var fetchString = `${ngrok_URL}/api/Conexao/RecusarConexao/${conn.id_Google_Solicitado_FK}/${user.userData.id}`;
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+
+        var init = {
+            method: "PUT",
+            headers: headers,
+        }
+
+        return fetch(fetchString, init);
+    }
+
 
     const excludeFriend = async (name: any, id: any) => {
         
@@ -33,14 +54,14 @@ export default function ModalAcceptFriend({ visibility, setVisibility, conn }: a
             {
                 text: "Cancelar",
                 onPress: async() => {
-                    return;
+                    return
                 },
                 style: "cancel"
             },
             {
                 text: "Confirmar",
                 onPress: async() => {
-                    declineConnection("trocar", id, user.id);
+                    recusarConexao();
                     Alert.alert("Conexão recusada!")
                     setTimeout(() => {
 
@@ -65,7 +86,7 @@ export default function ModalAcceptFriend({ visibility, setVisibility, conn }: a
             {
                 text: "Confirmar",
                 onPress: async() => {
-                    acceptConnectionID("trocar", id, user.id);
+                    aceitarConexao();
                     Alert.alert("Conexão recusada!")
                     setTimeout(() => {
 
@@ -96,12 +117,12 @@ export default function ModalAcceptFriend({ visibility, setVisibility, conn }: a
                 <View style={styles.container}>
                     {
                         conn.picture != undefined ?
-                        <Avatar source={{ uri: conn.picture }} size={150} rounded></Avatar>
+                        <Avatar source={{ uri: conn.picture.medium }} size={150} rounded></Avatar>
                         :
                         <Avatar source={require("../assets/images/user.png")} size={150} rounded></Avatar>
                     }
 
-                    <Text style={styles.header}>{setToThirdDigits(conn.name)}</Text>
+                    <Text style={styles.header}>{setToThirdDigits(conn.name.first + " " + conn.name.last)}</Text>
 
                     <View style={styles.inputArea}>
                         <Text style={styles.inputAreaFont}>E-mail da conexão: </Text>
@@ -110,7 +131,7 @@ export default function ModalAcceptFriend({ visibility, setVisibility, conn }: a
 
                     <View style={styles.inputArea}>
                         <Text style={styles.inputAreaFont}>ID de conexão: </Text>
-                        <Text style={[styles.input, { color: "pink" }]}>{conn.connectionString}</Text>
+                        <Text style={[styles.input, { color: "pink" }]}>{conn.login.uuid}</Text>
                     </View>
 
                     <View style={{ display: 'flex', flexDirection: 'row', margin: 10 }}>
@@ -124,7 +145,7 @@ export default function ModalAcceptFriend({ visibility, setVisibility, conn }: a
                             underlayColor={'rgb(50, 255, 0)'}
                             iconStyle={{ color: "black" }}
                             type="material-community"
-                            onPress={() => { excludeFriend(conn.name, conn.id) }}
+                            onPress={() => { excludeFriend(conn.name.first, conn.login.uuid) }}
                         />
                         <Icon
                             raised
